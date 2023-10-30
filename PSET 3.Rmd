@@ -1,0 +1,106 @@
+---
+title: "ECON 21020 PSET 3"
+author: "Allen Zhou"
+date: "10/29/2023"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = FALSE, include = FALSE}
+ds <- read.csv("C:\\Users\\Allen Zhou\\Downloads\\caschool.csv")
+library(tidyverse)
+library(haven)
+
+```
+(a) 420 Observations
+
+(b)
+  i. The variable *income* measures the average district income in dollars
+  ii. Mean = 15.31659, STD = 7.22589
+  iii. Mean = 15316.59, STD = 7225.89. These values are expected as *income* = *avginc* * 1000 so the mean and std should also be 1000 times larger as well
+```{r b, echo = TRUE}
+ds <- mutate(ds, income = avginc * 1000)
+
+mean_avginc <- mean(ds$avginc)
+std_avginc <- sd(ds$avginc)
+print(mean_avginc)
+print(std_avginc)
+
+mean_income <- mean(ds$income)
+std_income <- sd(ds$income)
+print(mean_income)
+print(std_income)
+```
+
+(c)
+  i. The mean math score across all districts is
+     653.3426
+  ii. Fraction of districts = 0.5785714, mean math
+      score = 655.7177
+  iii. Fraction of districts = 0.4214286, mean math
+       score = 650.0819
+  iv. Multiplying the fraction with the mean math
+      score of each respective districts yields in
+      the mean math score across all districts
+  v. Let M~s~ be the mean math score for class size
+     20 or fewer and let M~l~ be the mean math score 
+     for class size larger than 20.
+     H~0~: M~s~ = M~l~ or M~s~ - M~l~ = 0
+     H~1~: M~s~ != M~l~
+     t-statistic: 3.121799
+     p-value: 0.001922331
+     Since the p-value is less than alpha = 0.1, and
+     the t-statistic is greater than the absolute
+     value of the critical value, we reject the
+     null hypothesis
+  vi. Covariance between *avginc* and mean math score
+      is 94.7795. Covariance between *income* and
+      mean math score is 94779.5. The values are not       the same, but differ by a multiple of 1000,          which makes sense since *income* is *avginc* *
+      1000
+  vii. Correlation between *avginc* and mean math           score is 0.6993981. Correlation between              *income* and mean math score is also 
+       0.6993981. The two correlations are the same         because the two are measuring the same               relationship between average income and mean         math score, the only difference being the            units, which doesn't come into play when             measuring correlation.
+```{r c, echo = FALSE}
+mean_math <- mean(ds$math_scr)
+print(mean_math)
+
+class_size <- filter(ds, str <= 20)
+frac1 <- length(class_size$str)/420
+print(frac1)
+
+mean_class1 <- mean(class_size$math_scr)
+print(mean_class1)
+
+class_large <- filter(ds, str > 20)
+frac2 <- length(class_large$str)/420
+print(frac2)
+
+mean_class2 <- mean(class_large$math_scr)
+print(mean_class2)
+
+print(mean_class1*frac1 + mean_class2*frac2)
+
+ts <- (mean_class1 - mean_class2 -0)/sqrt((sd(class_size$math_scr))^2/length(class_size$math_scr)+(sd(class_large$math_scr))^2/length(class_large$math_scr))
+print(ts)
+
+p <- 2 * pt(q = -abs(ts), df = 418)
+print(p)
+
+qt(p=0.05, df=418)
+t.test(class_size$math_scr, class_large$math_scr)
+
+cov_avgincmath <- cov(ds$avginc, ds$math_scr)
+print(cov_avgincmath)
+cov_incmath <- cov(ds$income, ds$math_scr)
+print(cov_incmath)
+
+corr_avgincmath <- cor(ds$avginc, ds$math_scr)
+print(corr_avgincmath)
+corr_incmath <- cor(ds$income, ds$math_scr)
+print(corr_incmath)
+```
+
+```
+
