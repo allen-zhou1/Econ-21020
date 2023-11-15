@@ -1,0 +1,56 @@
+---
+title: "PSET 4 Q.7"
+author: "Allen Zhou"
+date: "2023-11-15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = FALSE, include = FALSE}
+library(readxl)
+ds <- read_excel("C:\\Users\\Allen Zhou\\Downloads\\birthweight_smoking.xlsx")
+library(tidyverse)
+library(haven)
+library(knitr)
+library(stargazer)
+library(gapminder)
+library(lmtest)
+library(sandwich)
+library(AER)
+```
+
+```{r}
+A <- lm(birthweight ~ smoker, data = ds)
+summary(A)
+```
+
+(a) difference is 253.23 grams for smoker vs non-smoker
+
+(b)
+```{r}
+B <- lm(birthweight ~ smoker + alcohol + nprevist, data = ds)
+summary(B)
+```
+
+i) both alcohol and nprevist may be correlated and relevant variables to birthweight and smoking, so these variables are confounding variables that may cause part (a) to have an overestimated effect that smoking has on birthweight
+
+ii) we see that the estimated difference fell from 253.23 to 217.58, so its possible that there may have been an omitted variable bias in part (a)
+
+iii) 3051.249 - 217.580(1) - 30.491(0) +34.070(8) = 3106.229 grams
+
+iv) R^2 is 0.07285 and R^2 adjusted is 0.7192 and they are so similar as the sample size is large
+
+v) the coefficient does not measure a causal effect of prenatal visits on birthweight as nprevist is a control variable. It is used to elimiate the effects of other factors besides alcohol and smoking on birthweight.
+
+(c)
+we would first regress Birthweight on Alcohol and Nprevist and store the residuals. Then we would regress Smoker on Alcohol and Nprevist and store the residuals. Finally, we would regress the residuals from step 1 with the residuals from step 2, which would result in the same estimator that we found for Smoker in part (b)
+
+```{r}
+step1 <- lm(birthweight ~ alcohol + nprevist, data = ds)
+step2 <- lm(smoker ~ alcohol + nprevist, data = ds)
+step3 <- lm(step1$residuals ~ step2$residuals)
+summary(step3)
+```
